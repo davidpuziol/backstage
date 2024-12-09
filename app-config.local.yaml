@@ -1,8 +1,5 @@
 app:
   baseUrl: http://localhost:3000
-backend:
-  listen:
-    port: 7007
     
 techdocs:
   generator:
