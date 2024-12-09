@@ -1,0 +1,140 @@
+# Default values for backstage.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: davidpuziol/backstage
+  pullPolicy: Always
+  tag: "v1.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Mudando o modo alteras a env NODE_ENV e carrega algumas variáveis específicas referente ao banco de dados.
+mode: production # pode ser development
+
+postgres: # Somente será usado em produção para apontar onde esta o banco. User e password deve estar nas secrets
+  # Caso o postgree esteja em outro namespace no cluster my-service.mynamespace.svc
+  # No caso abaixo estamos rodando no mesmo namespace então nao precisa .namespace.svc
+  # Se estiver rodando fora do cluster passar o host completo
+  host: "backstage-postgres-postgresql-hl"
+  port: "5432"
+
+secrets:
+  production: 
+    name: backstage-env-secrets # Nome da secret usada em produção
+    variables:
+      POSTGRES_USER: POSTGRES_USER
+      POSTGRES_PASSWORD: POSTGRES_PASSWORD
+      GITHUB_ACCOUNT: GITHUB_ACCOUNT
+      GITHUB_TOKEN: GITHUB_TOKEN
+      GITLAB_TOKEN: GITLAB_TOKEN
+      ARGOCD_AUTH_TOKEN_BACKSTAGE: ARGOCD_AUTH_TOKEN_BACKSTAGE
+      AUTH_GITHUB_CLIENT_ID: AUTH_GITHUB_CLIENT_ID
+      AUTH_GITHUB_CLIENT_SECRET: AUTH_GITHUB_CLIENT_SECRET
+      AUTH_GITLAB_CLIENT_ID: AUTH_GITLAB_CLIENT_ID
+      AUTH_GITLAB_CLIENT_SECRET: AUTH_GITLAB_CLIENT_SECRET
+      KUBERNETES_BACKSTAGE_SA_TOKEN: KUBERNETES_BACKSTAGE_SA_TOKEN
+  development: # Nome da secret usada em desenvolvimento como é só teste usamos a mesma secret
+    name: backstage-env-secrets
+    variables:
+      # O banco em desenvolvimento é em memória então não é necessário passar
+      # POSTGRES_USER: POSTGRES_USER
+      # POSTGRES_PASSWORD: POSTGRES_PASSWORD
+      GITHUB_ACCOUNT: GITHUB_ACCOUNT
+      GITHUB_TOKEN: GITHUB_TOKEN
+      GITLAB_TOKEN: GITLAB_TOKEN
+      ARGOCD_AUTH_TOKEN_BACKSTAGE: ARGOCD_AUTH_TOKEN_BACKSTAGE
+      AUTH_GITHUB_CLIENT_ID: AUTH_GITHUB_CLIENT_ID
+      AUTH_GITHUB_CLIENT_SECRET: AUTH_GITHUB_CLIENT_SECRET
+      AUTH_GITLAB_CLIENT_ID: AUTH_GITLAB_CLIENT_ID
+      AUTH_GITLAB_CLIENT_SECRET: AUTH_GITLAB_CLIENT_SECRET
+      KUBERNETES_BACKSTAGE_SA_TOKEN: KUBERNETES_BACKSTAGE_SA_TOKEN
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: false # Não precisa montar, pois fará acesso ao api usando a service account criada para esse cluster separadamente, simulando qualquer outro cluster.
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 7007
+
+ingress:
+  enabled: true
+  className: nginx
+  host: "backstage.localhost" # Esse valor será o mesmo usado para base_url do backend, somente em modo produtivo
+  pathType: ImplementationSpecific
+  # tls:
+  #   secretName: "backstage-tls-secret"
+
+resources: {} # Definir um resource aqui é necessário estudo, por enquanto vamos manter livre.
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe: # Precisa implementar um healthcheck no backstage, será feito posteriormente.
+  # httpGet:
+  #   path: /
+  #   port: http
+readinessProbe: # Precisa implementar um healthcheck no backstage, será feito posteriormente.
+  # httpGet:
+  #   path: /
+  #   port: http
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+# Podemos usar para definir um volume para manter os techdocs, será feito posteriormente.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: [] 
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

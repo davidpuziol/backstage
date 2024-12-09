@@ -1,0 +1,36 @@
+app:
+  baseUrl: ${BACKSTAGE_HOST}
+
+backend:
+  baseUrl: ${BACKSTAGE_HOST}
+  listen: ':7007'
+  # config options: https://node-postgres.com/apis/client
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+
+catalog:
+  locations:
+    - type: file
+      target: ./examples/entities.yaml
+
+    # Local example template
+    - type: file
+      target: ./examples/template/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Local example organizational data
+    - type: file
+      target: ./examples/org.yaml
+      rules:
+        - allow: [User, Group]
+
+kubernetes:
+  frontend:
+    podDelete: # Habilita o botão de exclusão do pod no painel de containers.
+      enabled: true
