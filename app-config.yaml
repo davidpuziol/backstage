@@ -136,8 +136,9 @@ kubernetes:
   clusterLocatorMethods:
     - type: 'config'
       clusters:
-        - name: 'cluster'
-          url: 'https://localhost:6443'  # Verifique se esta é a URL correta do Kind
+        - name: 'cluster-kind'
+          # url: 'https://localhost:6443'   Ajustamos isso para local
+          url: 'https://kubernetes.default.svc'  # Dentro do cluster o pod precisa referenciar o service pois localhost é o próprio pod
           authProvider: 'serviceAccount'
           skipTLSVerify: true
           skipMetricsLookup: true
