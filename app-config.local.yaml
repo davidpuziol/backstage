@@ -30,6 +30,17 @@ catalog:
       target: ../../examples/org.yaml
       rules:
         - allow: [User, Group]
+
+proxy:
+  '/argocd/api':
+    target: http://argo.localhost/api/v1/
+    changeOrigin: true
+    # only if your argocd api has self-signed cert
+    secure: false
+    headers:
+      Cookie:
+        $env: ARGOCD_AUTH_TOKEN_BACKSTAGE
+        
 kubernetes:
   serviceLocatorMethod: 
     type: 'multiTenant'

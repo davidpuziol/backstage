@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: davidpuziol/backstage
   pullPolicy: Always
-  tag: "v1.0.2"
+  tag: "v2.0.0"
 
 imagePullSecrets: []
 nameOverride: ""
